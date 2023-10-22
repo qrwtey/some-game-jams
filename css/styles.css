@@ -11,7 +11,7 @@ This stylesheet and the associated (x)html may be modified in any way to fit you
 }
 body {
     background-color: #aaa;
-    background-color: rgb(255, 255, 255);
+    background-color: rgb(117, 117, 117);
 }
 header {
     background-color:rgba(33, 33, 33, 0.9);
@@ -37,7 +37,7 @@ header a, a:visited {
 .example {
     margin: 50px auto 0;
     width: max-content;
-    border: 1px solid #444444;
+    border: 1px solid #c6c6c6;
     border-radius: 10px;
 }
 .player {
