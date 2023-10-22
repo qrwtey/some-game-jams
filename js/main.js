@@ -21,7 +21,7 @@ jQuery(document).ready(function() {
         var title = elem.text();
         var cover = elem.attr('cover');
         var artist = elem.attr('artist');
-
+        console.log("clicked on " + url);
         $('.player .title').text(title);
         $('.player .artist').text(artist);
         $('.player .cover').css('background-image','url(data/' + cover+')');;
@@ -30,8 +30,9 @@ jQuery(document).ready(function() {
 
         // timeupdate event listener
         song.addEventListener('timeupdate',function (){
-            var curtime = parseInt(song.currentTime, 10);
+            var curtime = parseInt(song.currentTime, 10 );
             tracker.slider('value', curtime);
+            console.log("chnage " + title + " tracker to " + curtime + ". Total: " + song.duration);
         });
 
         $('.playlist li').removeClass('active');
@@ -104,10 +105,10 @@ jQuery(document).ready(function() {
     });
 
     // playlist elements - click
-    $('.playlist li').click(function () {
+    $('.playlist li').click(function (e) {
+        e.preventDefault();
         stopAudio();
         initAudio($(this));
-        playAudio();
     });
 
     // initialization - first element in playlist
