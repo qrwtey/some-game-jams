@@ -5,6 +5,7 @@ jQuery(document).ready(function() {
     var tracker = $('.tracker');
     var volume = $('.volume');
     var isPlaying = false;
+    var currentVolume = 0.8; // Initialize with default volume (80%)
 
     function initAudio(elem) {
         var url = elem.attr('audiourl');
@@ -14,9 +15,12 @@ jQuery(document).ready(function() {
         console.log("clicked on " + url);
         $('.player .title').text(title);
         $('.player .artist').text(artist);
-        $('.player .cover').css('background-image','url(data/' + cover+')');;
+        $('.player .cover').css('background-image','url(data/' + cover + ')');
 
         song = new Audio('data/' + url);
+
+        // Set the volume of the new song to the current volume
+        song.volume = currentVolume;
 
         // Set up tracker max value to song duration when metadata loads
         song.addEventListener('loadedmetadata', function () {
@@ -108,17 +112,17 @@ jQuery(document).ready(function() {
     // Initialization - first element in playlist
     initAudio($('.playlist li:first-child'));
 
-    // Set volume
-    song.volume = 0.8;
-
     // Initialize the volume slider
     volume.slider({
         range: 'min',
         min: 1,
         max: 100,
-        value: 80,
+        value: currentVolume * 100,
         slide: function(event, ui) {
-            song.volume = ui.value / 100;
+            currentVolume = ui.value / 100;
+            if (song) {
+                song.volume = currentVolume;
+            }
         }
     });
 
@@ -128,7 +132,9 @@ jQuery(document).ready(function() {
         min: 0,
         max: 10, // temporary max, updated to song duration later
         slide: function(event, ui) {
-            song.currentTime = ui.value;
+            if (song) {
+                song.currentTime = ui.value;
+            }
         }
     });
 

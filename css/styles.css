@@ -203,3 +203,11 @@ body > div.example > div > div.tracker.ui-slider.ui-corner-all.ui-slider-horizon
 .bb{
     color: #98f; /* or any color you prefer */
 }
+.centered-white {
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    font-weight: normal;
+    text-align: center;  /* Centers the text */
+    color: white;        /* Sets text color to white */
+    padding-top: 20px;      /* Optional: add some padding */
+    font-size:14px;
+}
