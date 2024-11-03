@@ -1,13 +1,3 @@
-/**
- *
- * HTML5 Audio player with playlist
- *
- * Licensed under the MIT license.
- * http://www.opensource.org/licenses/mit-license.php
- * 
- * Copyright 2012, Script Tutorials
- * http://www.script-tutorials.com/
- */
 jQuery(document).ready(function() {
 
     // inner variables
@@ -28,51 +18,57 @@ jQuery(document).ready(function() {
 
         song = new Audio('data/' + url);
 
-        // timeupdate event listener
-        song.addEventListener('timeupdate',function (){
-            var curtime = parseInt(song.currentTime, 10 );
-            tracker.slider('value', curtime);
-            console.log("chnage " + title + " tracker to " + curtime + ". Total: " + song.duration);
+        // Set up tracker max value to song duration when metadata loads
+        song.addEventListener('loadedmetadata', function () {
+            tracker.slider("option", "max", song.duration);
         });
 
         $('.playlist li').removeClass('active');
         elem.addClass('active');
+
+        // Start updating the tracker using requestAnimationFrame
+        updateTracker();
     }
+
+    function updateTracker() {
+        if (song && isPlaying) {
+            tracker.slider('value', song.currentTime);
+            requestAnimationFrame(updateTracker);
+        }
+    }
+
     function playAudio() {
         song.play();
-
-        tracker.slider("option", "max", song.duration);
-
+        isPlaying = true;
         $('.play').addClass('hidden');
         $('.pause').addClass('visible');
-        isPlaying = true;
+
+        // Start updating the tracker on play
+        requestAnimationFrame(updateTracker);
     }
+
     function stopAudio() {
         song.pause();
-
+        isPlaying = false;
         $('.play').removeClass('hidden');
         $('.pause').removeClass('visible');
-        isPlaying = false;
     }
 
-    // play click
+    // Play click
     $('.play').click(function (e) {
         e.preventDefault();
-
         playAudio();
     });
 
-    // pause click
+    // Pause click
     $('.pause').click(function (e) {
         e.preventDefault();
-
         stopAudio();
     });
 
-    // forward click
+    // Forward click
     $('.fwd').click(function (e) {
         e.preventDefault();
-
         stopAudio();
 
         var next = $('.playlist li.active').next();
@@ -83,10 +79,9 @@ jQuery(document).ready(function() {
         playAudio();
     });
 
-    // rewind click
+    // Rewind click
     $('.rew').click(function (e) {
         e.preventDefault();
-
         stopAudio();
 
         var prev = $('.playlist li.active').prev();
@@ -97,63 +92,54 @@ jQuery(document).ready(function() {
         playAudio();
     });
 
-    // show playlist
+    // Show playlist
     $('.pl').click(function (e) {
         e.preventDefault();
-
         $('.playlist').fadeIn(300);
     });
 
-    // playlist elements - click
+    // Playlist elements - click
     $('.playlist li').click(function (e) {
         e.preventDefault();
         stopAudio();
         initAudio($(this));
     });
 
-    // initialization - first element in playlist
+    // Initialization - first element in playlist
     initAudio($('.playlist li:first-child'));
 
-    // set volume
+    // Set volume
     song.volume = 0.8;
 
-    // initialize the volume slider
+    // Initialize the volume slider
     volume.slider({
         range: 'min',
         min: 1,
         max: 100,
         value: 80,
-        start: function(event,ui) {},
         slide: function(event, ui) {
             song.volume = ui.value / 100;
-        },
-        stop: function(event,ui) {},
+        }
     });
 
-    // empty tracker slider
+    // Initialize the tracker slider
     tracker.slider({
         range: 'min',
-        min: 0, max: 10,
-        start: function(event,ui) {},
+        min: 0,
+        max: 10, // temporary max, updated to song duration later
         slide: function(event, ui) {
             song.currentTime = ui.value;
-        },
-        stop: function(event,ui) {}
-    });
-    document.body.onkeyup = function(e) {
-        if (e.key == " " ||
-            e.code == "Space" ||      
-            e.keyCode == 32      
-        ) {
-            console.log("hi");
-          if (isPlaying){
-            stopAudio();
-            console.log("stopAudio");
-          }
-          else{
-            playAudio();
-            console.log("playAudio");
-          }
         }
-      }
+    });
+
+    // Spacebar toggle play/pause
+    document.body.onkeyup = function(e) {
+        if (e.key == " " || e.code == "Space" || e.keyCode == 32) {
+            if (isPlaying) {
+                stopAudio();
+            } else {
+                playAudio();
+            }
+        }
+    };
 });
