@@ -7,32 +7,63 @@ jQuery(document).ready(function() {
     var isPlaying = false;
     var currentVolume = 0.8; // Initialize with default volume (80%)
 
-    function initAudio(elem) {
-        var url = elem.attr('audiourl');
-        var title = elem.text();
-        var cover = elem.attr('cover');
-        var artist = elem.attr('artist');
-        console.log("clicked on " + url);
-        $('.player .title').text(title);
-        $('.player .artist').text(artist);
-        $('.player .cover').css('background-image','url(data/' + cover + ')');
+    let currentSong = null;
+let currentUrl = '';
 
-        song = new Audio('data/' + url);
-
-        // Set the volume of the new song to the current volume
-        song.volume = currentVolume;
-
-        // Set up tracker max value to song duration when metadata loads
-        song.addEventListener('loadedmetadata', function () {
-            tracker.slider("option", "max", song.duration);
-        });
-
-        $('.playlist li').removeClass('active');
-        elem.addClass('active');
-
-        // Start updating the tracker using requestAnimationFrame
-        updateTracker();
+function initAudio(elem) {
+    var url = elem.attr('audiourl');
+    var title = elem.text();
+    var cover = elem.attr('cover');
+    var artist = elem.attr('artist');
+    
+    console.log("clicked on " + url);
+    
+    // Check if the same song is clicked
+    if (url === currentSong) {
+        // If the same song is clicked, pause it and return
+        if (song.paused) {
+            playAudio();
+        }
+        else{
+            pauseAudio();
+        }
+        return;
     }
+
+    // Update currentSongUrl to the new song
+    currentSong = url;
+
+    // Update player UI with new song details
+    $('.player .title').text(title);
+    $('.player .artist').text(artist);
+    $('.player .cover').css('background-image','url(data/' + cover + ')');
+
+    // Create a new Audio object with the new song URL
+    if (song != null) {
+        song.pause();
+    }
+    song = new Audio('data/' + url);
+
+    // Set the volume of the new song to the current volume
+    song.volume = currentVolume;
+
+    // Set up tracker max value to song duration when metadata loads
+    song.addEventListener('loadedmetadata', function () {
+        tracker.slider('value', 0);
+        tracker.slider("option", "max", song.duration);
+    });
+
+    // Remove active class from previous song and add to the new song
+    $('.playlist li').removeClass('active');
+    elem.addClass('active');
+
+    // Start updating the tracker using requestAnimationFrame
+    updateTracker();
+    if (isPlaying) {
+        song.play();
+    }
+}
+
 
     function updateTracker() {
         if (song && isPlaying) {
@@ -49,6 +80,9 @@ jQuery(document).ready(function() {
 
         // Start updating the tracker on play
         requestAnimationFrame(updateTracker);
+    }
+    function pauseAudio() {
+        stopAudio();
     }
 
     function stopAudio() {
@@ -105,7 +139,6 @@ jQuery(document).ready(function() {
     // Playlist elements - click
     $('.playlist li').click(function (e) {
         e.preventDefault();
-        stopAudio();
         initAudio($(this));
     });
 
